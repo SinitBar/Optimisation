@@ -1,0 +1,52 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+typedef double T;
+int counter = 0;
+T my_function(T x)
+{
+	counter++;
+	return (19 * x + 10 * pow(x, 2) + 15 * pow(x, 3) + 10 * pow(x, 4) + 24 * pow(x, 5) + 12 * pow(x, 6) + pow(x, 7) + 33 * pow(x, 8) + 3 * exp(-x) + 2 * exp(-3 * x) + 2 * exp(-18 * x));
+}
+void dihotomia(T a, T b, T epsilon) // метод деления пополам 
+{
+	T delta = 1.9*epsilon;
+	T length = 0.01; // длина локализующего отрезка [a;b]
+	T right = 0;
+	T left = 0;
+	int k = 0;
+	while (length >= 2 * epsilon) 
+	{	k++;
+		right = my_function((a + b + delta) / 2); // значение функции в правом конце локализующего отрезка 
+		left = my_function((a + b - delta) / 2); // значение в левом конце 
+		length = (length + delta) / 2; // длина локализующего отрезка 
+		if (left > right) 
+		{	cout << "(" << a << ", " << b << ")" << " ";
+            a = (a + b - delta) / 2;  // левая граница локализующего отрезка 
+			cout << fixed;
+			cout.precision(5);
+			cout << "x_" << k << " = " << a << ", f(x_" << k << ") = " << left << endl;
+		}
+		else 
+		{	cout << "(" << a << ", " << b << ")" << " ";
+            b = (a + b + delta) / 2; // правая граница локализующего отрезка
+			cout << fixed;
+			cout.precision(5);
+			cout << "x_" << k << " = " << b << ", f(x_" << k << ") = " << right << endl;
+		}
+		if (length < 2 * epsilon) // больше в цикл while не зайдет 
+		{
+			cout << fixed;
+			cout.precision(5);
+			cout << "x* = " << (a + b) / 2 << ", f(x*) = " << my_function((a + b) / 2) << endl; // так как длина отрезка < 2 епсилон, взяв середину погрешность будет < епсилон. 
+		}
+	}
+}
+int main() {
+	double epsilon = 0.0000049;
+	double a = 0.05, b = 0.06;
+	dihotomia(a, b, epsilon);
+	cout << "Количество вызовов функции в методе дихотомии = " << counter << endl;
+	counter = 0;
+	return 0;
+}
