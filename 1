@@ -1,0 +1,34 @@
+/* my_function - именная функция, которая дана. От нее мы берем производную в точке х = 0,05 и видим, что она меньше нуля. Затем считаем производную в точке х = 0,06 и видим, что она больше нуля. Значит, на отрезке[0,05; 0,06] данная функция достигает своего локального минимума.
+Примем а = 0,05; b = 0,06, и будем искать минимум данной функции на отрезке [а; b]
+n = 0,01 - длина отрезка в методе пассивного поиска, left и right - значения на концах локализующего отрезка.
+ */ 
+#include <iostream>
+#include <cmath>
+using namespace std;
+template <typename T>
+T my_function(T x) // именная функция
+{return (19*x+10*pow(x,2)+15*pow(x,3)+10*pow(x,4)+24*pow(x,5)+12*pow(x,6)+pow(x,7)+33*pow(x,8)+3*exp(-x)+2*exp(-3*x)+2*exp(-18*x));}
+template <typename T>
+void passive_search(T a,T epsilon,int n)
+{
+    T left=my_function(a);
+    T right=my_function(a+epsilon);
+    for(int i=0;i<n-1;i++) // в этом цикле считаются границы нового локализующего отрезка и значения в его новых концах. (уже для следующего шага)
+    {
+       cout<<"x_"<<i<<"="<<a<<",f(x_"<<i<<")="<<my_function(a)<<endl;
+       if(right<left) {   
+          a=a+epsilon; 
+          left=right; // для следующего шага нынешний правый будет левым // тут left = right = my_function(a), где а с учетом предыдущей строчки 
+          right=my_function(a+epsilon); // от 2 предыдущих уже посчитано 
+          }
+       else  // так как функция унимодальна, то дальше она только возрастает 
+       {
+          cout<<"x* = "<<floor(a*100000)/100000<<", f(x*) = "<<left<< endl;
+          return;}}}
+int main() {
+double a=0.05,b=0.06;
+int n=100; // кол-во итераций 
+double epsilon=(b-a)/n;
+passive_search(a,epsilon,n);
+    return 0;
+}
