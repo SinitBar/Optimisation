@@ -1,0 +1,120 @@
+// ConsoleApplication1.cpp : Defines the entry point for the console application.
+//
+#include <iostream>
+#include <complex>
+#include <vector>
+using namespace std;
+typedef double T;
+typedef vector<complex<T>> Polinom;
+complex<T> gorner(const Polinom & f, const complex<T> point)
+{
+	complex<T> result = f[0];
+	for (int i = 1; i < f.size(); i++)
+	{
+		result *= point;
+		result += f[i];
+	}
+	return result;
+}
+Polinom pl{ complex<T>(19,0), complex<T>(10,0), complex<T>(15,0), complex<T>(10,0), complex<T>(0,1) }; // данный полином
+Polinom Q{ complex<T>(76, 0), complex<T>(30, 0), complex<T>(30, 0), complex<T>(10, 0) }; // Q - сопряженный полином, производная полинома pl
+ 
+T f(complex<T> z) // возвращает модуль данного полинома в квадрате
+{
+	complex<T> result = gorner(pl, z);
+	result *= conj(result);
+	return real(result);
+}
+complex<T> gradient(complex<T> z)
+{
+	complex<T> result = conj(gorner(pl, z));
+	result *= gorner(Q, z);
+	result = complex<T>(2, 0)*conj(result);
+	return result;
+ 
+}
+T modul_gradient(complex<T> z) // возвращает модуль градиента в квадрате
+{
+	complex<T> result = gradient(z);
+	result *= conj(result);
+	return real(result);
+}
+complex<T> change_step_gradient(const complex<T> start_point, const T epsilon, const T delta)
+{
+	complex<T> z_0 = start_point;
+	complex<T> z_1(0, 0);
+	complex<T> alpha(0.1, 0);
+	do
+	{
+		complex<T> grad0 = gradient(z_0);
+			T mgrad = modul_gradient(z_0);
+		cout << real(alpha) << " " << grad0 <<"   "<< mgrad;
+		z_1 = z_0 - alpha * gradient(z_0);
+		T f_from_z_1 = f(z_1);
+		T f_from_z_0 = f(z_0);
+		cout << "  " << f_from_z_1 << " " << f_from_z_0 << " " << f_from_z_1 - f_from_z_0 << endl;
+		if (f_from_z_1 - f_from_z_0 > -real(alpha)*epsilon*mgrad)
+		{
+			alpha *= complex<T>(0.5, 0);
+			continue;
+		}
+		z_0 = z_1;
+		cout << "  md  " << modul_gradient(z_0) << endl;
+	} while (modul_gradient(z_0) > delta*delta);
+	return z_0;
+}
+ 
+complex<T> data_step_gradient(const complex<T> start_point, const T epsilon, const T delta) // с заранее заданным шагом
+{
+	int k = 100;
+	complex<T> z_0 = start_point;
+	complex<T> z_1(0, 0);
+	complex<T> alpha(1, 0);
+	T f_from_z_0;
+	do
+	{
+		alpha = complex<T>(1.0 / k, 0);
+		cout << real(alpha) << " " << (gradient(z_0));
+		z_1 = z_0 - alpha * gradient(z_0);
+		T f_from_z_1 = f(z_1);
+		f_from_z_0 = f(z_0);
+		cout << "  " << f_from_z_1 << " " << f_from_z_0 << " " << f_from_z_1 - f_from_z_0 << endl;
+		z_0 = z_1;
+		k++;
+		cout << "  md  " << f_from_z_0 << " pt " << z_0 << endl;
+	} while (f_from_z_0 > delta);
+	return z_0;
+}
+ 
+complex<T> const_step_gradient(const complex<T> start_point, const T epsilon, const T delta) // с заранее заданным шагом
+{
+	complex<T> z_0 = start_point;
+	complex<T> z_1(0, 0);
+	complex<T> alpha(0.001, 0);
+	complex<T> grad0 = gradient(z_0);
+	T f_from_z_0 = f(z_0);
+	while(real(grad0 * conj(grad0))> delta * delta)
+	{
+		cout << real(alpha) << " " << grad0;
+		z_0 -= alpha * grad0;
+		//T f_from_z_1 = f(z_1);
+		f_from_z_0 = f(z_0);
+		grad0 = gradient(z_0);
+		//cout << "  " << f_from_z_1 << " " << f_from_z_0 << " " << f_from_z_1 - f_from_z_0 << endl;
+		//z_0 = z_1;
+		cout << "  md  " << f_from_z_0 << " pt " << z_0 << endl;
+	} 
+	return z_0;
+}
+ 
+int main()
+{
+	T epsilon = 0.0001, delta = 0.0000001;
+	complex<T> result = change_step_gradient(complex<T>(0, 0), epsilon, delta);
+	cout <<endl<<endl<<endl << result << endl << f(result)<<endl<<endl<<endl<<endl;
+	result = data_step_gradient(complex<T>(0, 0), epsilon, delta * 0.0001);
+	cout << result << endl << f(result) << endl;
+	result = const_step_gradient(complex<T>(0, 0), epsilon, delta);
+	cout << result << endl << f(result) << endl;
+	return 0;
+}
