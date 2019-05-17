@@ -1,0 +1,58 @@
+#include <iostream>
+#include <cmath>
+typedef double T;
+using namespace std;
+int counter = 0;
+T my_function (T point)
+{ counter++;
+	T mas[9] = { 0, 19, 10, 15, 10, 24, 12, 1, 33 }; // первый элемент - свободный член полинома, остальное - коэфф. при х, степень повышается с повышением индекса
+	for (int i = 8; i > 0; i--) // в итоге в mas[0] лежит значение функции в точке point
+	{	mas[i-1] += point*mas[i];
+		mas[i] = 0;
+	}
+	T bla = exp(-point);
+	return(mas[0] + 3*bla + 2*pow(bla, 3) + 2*pow(bla, 18));
+}
+// последовательность Фибоначчи
+    T F[18] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584};
+void Fibonacchi (T a, T b, int n)
+   {T c = a + (b-a)*(F[n-2]/F[n]);
+    T d = a + (b-a)*(F[n-1]/F[n]);
+    T left = my_function(c); // значение функции в левом краю локализующего отрезка
+    T right = my_function(d); // в правом 
+    for (int i = 2; i < n; i++)
+       {if (left >= right)
+          {cout << "(" << c << ", " << b << ")" << " ";
+            cout << "x_" << i-2 << " = " << d << ", f(x_" << i-2 << ") = " << right << endl;
+          a = c;
+          cout << fixed;
+          cout.precision(5);
+          c = d;
+          left = right; // будущий левый = нынешнему правому 
+          d = a + (b-a)*(F[n-i]/F[n+1-i]);
+          right = my_function (d);
+       }
+       else
+           {cout << "(" << a << ", " << d << ")" << " ";
+            cout << "x_" << i-2 << " = " << c << ", f(x_" << i-2 << ") = " << left << endl;
+           b = d;
+           cout << fixed;
+           cout.precision(5);
+           d = c;
+           right = left;
+           c = a + (b-a)*(F[n-i-1]/F[n+1-i]);
+           left = my_function (c);
+           }
+        }
+         cout << fixed;
+         cout.precision(5);
+         cout << "x* = " << c << ", f(x*) = " << left << endl;
+   }
+int main() {
+double a = 0.05, b = 0.06;
+double epsilon = 0.0000049; 
+int n = 16; // F(n+2) >= (b-a)/epsilon , F(18)=2584, F(17) = 1597, (b-a)/epsilon = 2040.816... Тогда n = 16 
+Fibonacchi(a, b, n);
+cout<<"Количество вызовов функции = "<<counter<<endl; // 14 в цикле for, 2 до него, и один для x*
+    return 0;
+}
