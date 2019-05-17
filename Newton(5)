@@ -1,0 +1,31 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+float my_function(float x)
+{
+	return (19 * x + 10 * pow(x, 2) + 15 * pow(x, 3) + 10 * pow(x, 4) + 24 * pow(x, 5) + 12 * pow(x, 6) + pow(x, 7) + 33 * pow(x, 8) + 3 * exp(-x) + 2 * exp(-3 * x) + 2 * exp(-18 * x));
+}
+float first_dx(float x)
+{
+	return (19 + 20 * x + 45 * pow(x, 2) + 40 * pow(x, 3) + 120 * pow(x, 4) + 72 * pow(x, 5) + 7 * pow(x, 6) + 264*pow(x, 7) - 3 * exp(-x) -6 * exp(-3 * x) -36 * exp(-18 * x));
+}
+float second_dx (float x)
+{
+	return (20 + 90 * x + 120 * pow(x, 2) + 480 * pow(x, 3) + 360 * pow(x, 4) + 42 * pow(x, 5) + 1848 * pow(x, 6) + 3 * exp(-x) +18 * exp(-3 * x) +648 * exp(-18 * x));
+}
+void Newton(float a, float b, float epsilon, float point)
+{
+	int k = 0;
+	while (first_dx(point) > epsilon)
+	{
+ 
+	}
+}
+int main()
+{
+	float a = 0.05, b = 0.06; // левая и правая граница отрезка поиска соответственно
+	float epsilon = 0.00001; // погрешность
+	float start = 0.055; // начальная точка
+	Newton(a, b, epsilon, start);
+    return 0;
+}
