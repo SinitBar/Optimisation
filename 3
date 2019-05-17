@@ -1,0 +1,54 @@
+#include <iostream>
+#include <cmath> 
+using namespace std;
+int counter = 0;
+typedef double T;
+T my_function(T point)
+{	counter++;
+	T mas[9] = { 0, 19, 10, 15, 10, 24, 12, 1, 33 }; // первый элемент - свободный член полинома, остальное - коэфф. при х, степень повышается с повышением индекса
+	for (int i = 8; i > 0; i--) // в итоге в mas[0] лежит значение функции в точке point
+	{	mas[i - 1] += point * mas[i];
+		mas[i] = 0;
+	}
+	T bla = exp(-point);
+	return(mas[0] + 3 * bla + 2 * pow(bla, 3) + 2 * pow(bla, 18));
+}
+void golden_section(T epsilon, T a, T b) 
+{	T five = sqrt(5);
+	T three = sqrt(3);
+	T c = ((3 - five) / 2)*(b - a) + a; // [c;d] - локализующий отрезок 
+	T d = ((five - 1) / 2)*(b - a) + a;
+	T left = my_function(c); // значение функции в левом конце 
+	T right = my_function(d); // в правом 
+	int i = 0;
+	while ((b - a) / 2 > epsilon) 
+	{	i++;
+		cout << fixed;
+		cout.precision(5);
+		cout << "x_" << i << " = " << a << ", f(x_" << i << ") = " << my_function(a) << endl;
+		if (left <= right) 
+		{	b = d;
+			d = c;
+			c = ((3 - five) / 2)*(b - a) + a;
+			right = left;
+			left = my_function(c);
+		}
+		else 
+		{	a = c;
+			c = d;
+			d = ((five - 1) / 2)*(b - a) + a;
+			left = right;
+			right = my_function(d);
+		}
+	}
+	cout << fixed;
+	cout.precision(5);
+	cout << "x* = " << (a + b) / 2 << ", f(x*) = " << my_function((a + b) / 2) << endl;
+}
+int main() {
+	double epsilon = 0.00000049;
+	double a = 0.05, b = 0.06;
+	golden_section(epsilon, a, b);
+	cout << "Количество вызовов функции = " << counter << endl;
+	return 0;
+}
